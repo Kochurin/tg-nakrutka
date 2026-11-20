@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Накрутка Telegram-канала: проверка</title>
+<meta name="description" content="Введите @username публичного канала и узнайте, похожи ли его просмотры, реакции и подписчики на живую аудиторию">
+<meta property="og:title" content="Проверка Telegram-канала на накрутку">
+<meta property="og:description" content="Охват, ровность просмотров, реакции и регулярность постов по открытой ленте t.me/s">
+<style>
+:root {
+  --bg: #f6f7f9; --card: #fff; --text: #14181f; --muted: #5d6675; --line: #e3e6eb;
+  --accent: #2a7de1; --ok: #1f9d55; --warn: #d98a00; --bad: #d64545; --na: #9aa3b1; --bar: #9cc3f2;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0f1216; --card: #171b21; --text: #e8ebf0; --muted: #98a1ae; --line: #2a3038; --accent: #5aa2ff; --bar: #35577f; }
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif }
+main { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px }
+h1 { font-size: 30px; line-height: 1.15; margin: 0 0 8px }
+.lead { color: var(--muted); margin: 0 0 24px }
+form { display: flex; gap: 8px }
+input { flex: 1; min-width: 0; font: inherit; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text) }
+input:focus { outline: 2px solid var(--accent); outline-offset: -1px }
+button { font: inherit; font-weight: 600; padding: 12px 20px; border: 0; border-radius: 10px; background: var(--accent); color: #fff; cursor: pointer }
+button:disabled { opacity: .6; cursor: wait }
+.examples { margin: 10px 0 0; color: var(--muted); font-size: 14px }
+.examples a { color: var(--accent); cursor: pointer; text-decoration: none; margin-right: 10px }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-top: 20px }
+.err { color: var(--bad) }
+.head { display: flex; gap: 16px; align-items: center }
+.head img { width: 56px; height: 56px; border-radius: 50%; flex: none; object-fit: cover; background: var(--line) }
+.head h2 { margin: 0; font-size: 20px; line-height: 1.25; overflow-wrap: anywhere }
+.head .sub { color: var(--muted); font-size: 14px }
+.head a { color: inherit }
+.score { display: flex; gap: 20px; align-items: center; margin-top: 20px }
+.ring { width: 112px; height: 112px; flex: none; position: relative }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg) }
+.ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 34px }
+.verdict { font-size: 22px; font-weight: 700; line-height: 1.2 }
+.verdict + p { color: var(--muted); margin: 6px 0 0; font-size: 14px }
+.checks { list-style: none; padding: 0; margin: 16px 0 0 }
+.checks li { display: grid; grid-template-columns: 12px 1fr auto; gap: 4px 12px; padding: 12px 0; border-top: 1px solid var(--line) }
+.dot { width: 12px; height: 12px; border-radius: 50%; margin-top: 6px }
+.ok .dot { background: var(--ok) } .warn .dot { background: var(--warn) } .bad .dot { background: var(--bad) } .na .dot { background: var(--na) }
+.checks strong { font-weight: 600 }
+.checks .pts { color: var(--muted); font-size: 14px; white-space: nowrap }
+.checks p { grid-column: 2 / 4; margin: 0; color: var(--muted); font-size: 15px }
+.na strong { color: var(--muted) }
+.notes { margin: 12px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px }
+.chart h3 { margin: 0 0 4px; font-size: 16px }
+.chart p { margin: 0 0 12px; color: var(--muted); font-size: 14px }
+.chart svg { width: 100%; height: 160px; display: block }
+.chart .axis { fill: var(--muted); font-size: 11px }
+.foot { margin-top: 28px; color: var(--muted); font-size: 14px }
+.foot a { color: var(--accent) }
+.spin { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: s 0.8s linear infinite; vertical-align: -3px; margin-right: 8px }
+@keyframes s { to { transform: rotate(360deg) } }
+@media (max-width: 520px) {
+  h1 { font-size: 25px }
+  form { flex-direction: column }
+  .score { align-items: flex-start }
+  .ring { width: 88px; height: 88px }
+  .ring b { font-size: 26px }
+}
+</style>
+</head>
+<body>
+<main>
+  <h1>Накручен ли Telegram-канал</h1>
+  <p class="lead">Перед покупкой рекламы вставьте ссылку или @username публичного канала. Сервис прочитает его открытую ленту и посмотрит, похожи ли просмотры и реакции на живых людей</p>
+  <form id="f">
+    <input id="u" placeholder="@channel или t.me/channel" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+    <button id="go">Проверить</button>
+  </form>
+  <p class="examples">Примеры: <a data-c="durov">@durov</a><a data-c="breakingmash">@breakingmash</a><a data-c="addmeto">@addmeto</a></p>
+  <div id="out"></div>
+  <p class="foot">Оценка — эвристика по открытым данным, а не приговор. Как считается каждый признак и где он ошибается, написано в <a href="https://github.com/Kochurin/tg-nakrutka#как-считается">README</a>. Код открыт: <a href="https://github.com/Kochurin/tg-nakrutka">github.com/Kochurin/tg-nakrutka</a></p>
+</main>
+<script type="module">
+import { analyze } from "./score.js";
+
+const API = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? "http://127.0.0.1:8787" : "https://tg-nakrutka.kochurin9315.workers.dev";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const fmt = n => n == null ? "?" : n >= 1e6 ? `${(n / 1e6).toFixed(n >= 1e7 ? 0 : 1)} млн` : n >= 1e4 ? `${Math.round(n / 1e3)} тыс` : String(n).replace(/\B(?=(\d{3})+$)/g, " ");
+const COLORS = { ok: "var(--ok)", warn: "var(--warn)", bad: "var(--bad)" };
+const ERRORS = {
+  bad_name: "Это не похоже на username канала: нужны латинские буквы, цифры и _, от 4 до 32 символов",
+  not_found: "Такого публичного канала нет. Закрытые каналы по ссылке-приглашению проверить нельзя",
+  not_channel: "По этому адресу не публичный канал: это человек, бот или группа без открытой ленты",
+  rate_limited: "Слишком много проверок подряд. Подождите минуту",
+  upstream: "Telegram не ответил. Попробуйте ещё раз через минуту",
+};
+
+function ring(score, level) {
+  const r = 52, c = 2 * Math.PI * r, v = score ?? 0;
+  return `<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="${r}" fill="none" stroke="var(--line)" stroke-width="10"/>
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="${COLORS[level] || "var(--na)"}" stroke-width="10" stroke-linecap="round"
+    stroke-dasharray="${c * v / 100} ${c}"/></svg><b>${score ?? "?"}</b></div>`;
+}
+
+// столбики просмотров по постам: по ним глазами видно, ровная ли кривая
+function chart(data) {
+  const now = Date.parse(data.fetchedAt);
+  const posts = data.posts.filter(p => p.views != null).slice(-60);
+  if (posts.length < 5) return "";
+  const max = Math.max(...posts.map(p => p.views));
+  const W = 600, Hh = 140, bw = W / posts.length;
+  const subs = data.header.subscribers;
+  const bars = posts.map((p, i) => {
+    const h = Math.max(1, p.views / max * Hh);
+    const young = now - Date.parse(p.date) < 24 * 3600e3;
+    return `<rect x="${(i * bw + bw * 0.15).toFixed(1)}" y="${(Hh - h).toFixed(1)}" width="${(bw * 0.7).toFixed(1)}" height="${h.toFixed(1)}" rx="1.5"
+      fill="var(--bar)" opacity="${young ? 0.45 : 1}"><title>${new Date(p.date).toLocaleString("ru")}: ${fmt(p.views)} просмотров</title></rect>`;
+  }).join("");
+  const d0 = new Date(posts[0].date).toLocaleDateString("ru"), d1 = new Date(posts[posts.length - 1].date).toLocaleDateString("ru");
+  return `<div class="card chart"><h3>Просмотры последних ${posts.length} постов</h3>
+    <p>Самый высокий столбик — ${fmt(max)}${subs ? `, подписчиков ${fmt(subs)}` : ""}. Бледные посты младше суток, они ещё набирают просмотры</p>
+    <svg viewBox="0 0 ${W} ${Hh + 18}" preserveAspectRatio="none" role="img" aria-label="Просмотры по постам">${bars}
+    <text class="axis" x="0" y="${Hh + 14}">${d0}</text><text class="axis" x="${W}" y="${Hh + 14}" text-anchor="end">${d1}</text></svg></div>`;
+}
+
+function render(data) {
+  const r = analyze(data);
+  const h = data.header;
+  const checks = r.checks.map(c => `<li class="${c.level}"><span class="dot"></span><strong>${esc(c.title)}</strong>
+    <span class="pts">${c.max ? `${c.points} из ${c.max}` : "нет данных"}</span><p>${esc(c.text)}</p></li>`).join("");
+  const when = new Date(data.fetchedAt).toLocaleString("ru", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" });
+  $("#out").innerHTML = `<div class="card">
+    <div class="head">${h.photo ? `<img src="${esc(h.photo)}" alt="" referrerpolicy="no-referrer">` : ""}
+      <div><h2><a href="https://t.me/${esc(data.name)}" target="_blank" rel="noopener">${esc(h.title || data.name)}</a></h2>
+      <div class="sub">@${esc(data.name)} · ${fmt(h.subscribers)} подписчиков · ${r.stats.posts} постов в открытой ленте</div></div></div>
+    <div class="score">${ring(r.score, r.verdict?.level)}<div><div class="verdict">${esc(r.verdict?.text || "Не хватает данных для оценки")}</div>
+      <p>Балл — сколько набрано из возможного по признакам, где хватило данных. Данные на ${when}${data.cached ? ", из кэша" : ""}</p></div></div>
+    <ul class="checks">${checks}</ul>
+    ${r.notes.length ? `<ul class="notes">${r.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}
+  </div>${chart(data)}`;
+}
+
+async function check(raw) {
+  const u = raw.trim().replace(/^@|^(https?:\/\/)?(t\.me|telegram\.me)\/(s\/)?/i, "").split(/[/?#\s]/)[0];
+  if (!u) return;
+  $("#u").value = "@" + u;
+  history.replaceState(null, "", `?c=${encodeURIComponent(u)}`);
+  $("#go").disabled = true;
+  $("#out").innerHTML = `<div class="card"><span class="spin"></span>Читаю открытую ленту t.me/s/${esc(u)}…</div>`;
+  try {
+    const res = await fetch(`${API}/api/channel?u=${encodeURIComponent(u)}`);
+    const data = await res.json();
+    if (data.error) throw new Error(ERRORS[data.error] || data.error);
+    render(data);
+  } catch (e) {
+    $("#out").innerHTML = `<div class="card err">${esc(e.message === "Failed to fetch" ? "Сервер проверки недоступен. Попробуйте позже" : e.message)}</div>`;
+  } finally {
+    $("#go").disabled = false;
+  }
+}
+
+$("#f").addEventListener("submit", e => { e.preventDefault(); check($("#u").value); });
+document.querySelectorAll(".examples a").forEach(a => a.addEventListener("click", () => check(a.dataset.c)));
+const start = new URLSearchParams(location.search).get("c");
+if (start) check(start);
+</script>
+</body>
+</html>

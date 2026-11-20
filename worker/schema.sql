@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS subs (
+  name TEXT NOT NULL,
+  day  TEXT NOT NULL,
+  n    INTEGER NOT NULL,
+  PRIMARY KEY (name, day)
+);

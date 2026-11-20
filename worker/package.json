@@ -1,0 +1,1 @@
+{ "name": "tg-nakrutka-worker", "private": true, "type": "module", "scripts": { "dev": "wrangler dev", "deploy": "wrangler deploy", "db:local": "wrangler d1 execute tg-nakrutka --local --file=schema.sql" } }
